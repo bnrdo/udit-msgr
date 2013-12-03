@@ -13,6 +13,10 @@
 		<link rel="stylesheet" type="text/css" href='<c:out value="${pageContext.request.contextPath}"/>/css/uditmsgr.css' />
 		<script src='<c:out value="${pageContext.request.contextPath}"/>/js/jquery.min.js'></script>
 		<script type='text/javascript'>
+		
+			window.onresize = function(){
+			    window.resizeTo(408,491);
+			};
 
 			var d = document;
 			var sendMessageTextA;
@@ -98,7 +102,7 @@
 			}
 			
 			function stylizeParticipant(name, isOnline){
-				return "<table border=0 cellSpacing=0 cellPadding=0 width='100%' style='float:left;'><tr><td width='20px' align='left'><img src='<c:out value="${pageContext.request.contextPath}"/>/images/user_online.png'/></td><td align='left'>" + name + "</td></tr></table>";
+				return "<table border=0 cellSpacing=0 cellPadding=0 width='100%' style='float:left;'><tr><td width='20px' align='left'><img src='<c:out value="${pageContext.request.contextPath}"/>/images/user_online.png'/></td><td align='left' class='font-black'>" + name + "</td></tr></table>";
 			}
 			
 			function sendMessage(){
@@ -156,9 +160,11 @@
 					if(participant !== ""){
 						if(strip(participant) === name){
 							if(isOnline){
-								participant = participant.replace("user_offline.png", "user_online.png");
+								participant = participant.replace("user_offline.png", "user_online.png")
+															.replace("class=\"font-gray\"", "class=\"font-black\"");
 							}else{
-								participant = participant.replace("user_online.png", "user_offline.png");
+								participant = participant.replace("user_online.png", "user_offline.png")
+															.replace("class=\"font-black\"", "class=\"font-gray\"");
 							}
 						}
 
@@ -180,6 +186,10 @@
 			   tmp.innerHTML = html;
 			   return tmp.textContent || tmp.innerText || "";
 			}
+			
+			function editName(){
+				
+			}
 		</script>
 	</head>
 	<body onload="onloadHook()">
@@ -198,19 +208,21 @@
 							</div>
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/logout.png' style="float:right; margin-top:7px;" class="top-options-imgs" onclick="logout()">
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/settings.png' style="float:right; margin-right: 5px; margin-top:7px;" class="top-options-imgs">
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/pen.png' style="float:right; margin-right: 8px; margin-top:7px;" class="top-options-imgs">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/attach.png' style="float:right; margin-right: 8px; margin-top:7px;" class="top-options-imgs">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/smiley.png' style="float:right; margin-right: 8px; margin-top:7px;" class="top-options-imgs">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/pen.png' style="float:right; margin-right: 8px; margin-top:7px;" class="top-options-imgs" onclick="editName()">
 						</div>
 					</td>
 				</tr>
 				<tr>
-					<td>
+					<td style="padding-left:1px;">
 						<!-- <textarea id="chatDisplayMessageTextArea" class="chatTextArea" readonly></textarea> -->
 						<div class="messages-area">
 							<div id="chatDisplayMessageTextArea">
 							</div>
 						</div>
 					</td>
-					<td>
+					<td style="padding-right:1px;">
 						<!-- <textarea id="chatParticipantsListTextArea" class="chatTextArea border-none" readonly></textarea> -->
 						<div class="participants-area">
 							<div id="chatParticipantsListTextArea"></div>
@@ -219,8 +231,8 @@
 				</tr>
 				<tr>
 					<td height="20%" width="75%" class="compose-area"><textarea id="chatSendMessageTextArea" class="chatTextArea"></textarea></td>
-					<td height="20%" width="25%" class="compose-area" align="right">
-						<input type="button" id="btnSend" class="white-button" onclick="sendMessage()" value="    Send    "/>
+					<td height="20%" width="25%" style="padding-top: 4px; padding-left: 2px;" align="center" valign="top">
+						<input type="button" id="btnSend" class="white-button" onclick="sendMessage()" value="Send"/>
 					</td>
 				</tr>
 			</table>

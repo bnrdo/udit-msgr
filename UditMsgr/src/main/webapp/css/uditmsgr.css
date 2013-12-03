@@ -4,8 +4,9 @@
 	margin: 0px;
 	padding: 0px;
 }
+
 .compose-area{
-	padding: 5px 5px 5px 5px;
+	padding: 5px 5px 5px 1px;
 }
 .participants-area{
 	border-bottom: 1px solid gray;
@@ -128,6 +129,10 @@
 	box-sizing: border-box;
 }
 
+.font-black {
+	color: #000000 !important;
+}
+
 .font-gray {
 	color: #5A696B !important;
 }
@@ -159,9 +164,12 @@
 
 
 #btnSend {
-	width: 100%;
-	height: 100%;
+	background: url('../images/send.png') no-repeat top left;
+    padding-left: 28px;
+    height: 40px;
+    width: 100px;
 	box-sizing: border-box;
+	background-position: 10px;
 }
 
 #chatArea {
@@ -197,6 +205,14 @@
 
 .padding-10 {
 	padding: 10px 10px 10px 10px;
+}
+
+.padding-top-3 {
+	padding-top: 3px;
+}
+
+.padding-top-5 {
+	padding-top: 5px;
 }
 
 .padding-top-10 {
@@ -235,6 +251,4 @@
 	background-color: white;
 	color: #888888;
 	border-spacing: 0;
-	border-collapse: collapse;
-	border: ridge 1px #888888;
 }
