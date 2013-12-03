@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.bnrdo.uditmsgr.dao.ChatRepository;
 import com.bnrdo.uditmsgr.domain.Message;
+import com.bnrdo.uditmsgr.domain.TerminateUpdate;
 import com.bnrdo.uditmsgr.domain.Update;
 import com.bnrdo.uditmsgr.domain.User;
 import com.bnrdo.uditmsgr.domain.UserMessage;
@@ -76,13 +77,24 @@ public class ChatRepositoryImpl implements ChatRepository{
 	@Override
 	public void onlineSubscriber(User user) {
 		user.setOnline(true);
-		//broadcast to subscribed user's message q
+		
+		//update the subscribers repo
+		for(User subscriber : subscribers){
+			if(subscriber.equals(user)){
+				subscriber.setOnline(true);
+			}
+		}
+		
+		//broadcast to subscribed user's message q. 
+		//Should not be published to offline subscriber's q.
 		for(Entry<User, BlockingQueue<Update>> s : _Q.entrySet()){
-			BlockingQueue<Update> q = s.getValue();
-			
-			Update userUpdate = new UserUpdate(user);
-			
-			q.add(userUpdate);
+			if(!getOfflineSubcribers().contains(s.getKey())){
+				BlockingQueue<Update> q = s.getValue();
+				
+				Update userUpdate = new UserUpdate(user);
+				
+				q.add(userUpdate);
+			}
 		}
 	}
 
@@ -95,15 +107,26 @@ public class ChatRepositoryImpl implements ChatRepository{
 			if(subscriber.equals(user)){
 				subscriber.setOnline(false);
 			}
-				
 		}
 		
-		//broadcast to subscribed user's message q
+		//broadcast to other subscribed user's message q
 		for(Entry<User, BlockingQueue<Update>> s : _Q.entrySet()){
 			BlockingQueue<Update> q = s.getValue();
+			User qOwner = s.getKey();
 			
-			Update userUpdate = new UserUpdate(user);
-			q.add(userUpdate);
+			//if this current q owner is the user, that should add the poison pill to 
+			//his q, so that fetching of updates will stop.
+			if(qOwner.equals(user)){
+				q.add(new TerminateUpdate());
+			}else{
+				if(!getOfflineSubcribers().contains(qOwner)){
+					Update userUpdate = new UserUpdate(user);
+					q.add(userUpdate);
+				}
+			}
+			//if(!s.getKey().equals(user)){
+				
+			//}
 		}
 	}
 
@@ -140,5 +163,44 @@ public class ChatRepositoryImpl implements ChatRepository{
 				break;
 			}
 		}
+	}
+
+	@Override
+	public boolean isUsernameExisting(String userName) {
+		
+		for(User subscriber : subscribers){
+			if(subscriber.getUserName().trim().equalsIgnoreCase(userName.trim())){
+				return true;
+			}
+				
+		}
+		
+		return false;
+	}
+
+	@Override
+	public List<User> getOnlineSubcribers() {
+		List<User> retVal = new ArrayList<User>();
+		
+		for(User user : subscribers){
+			if(user.isOnline()){
+				retVal.add(user);
+			}
+		}
+		
+		return retVal;
+	}
+
+	@Override
+	public List<User> getOfflineSubcribers() {
+		List<User> retVal = new ArrayList<User>();
+		
+		for(User user : subscribers){
+			if(!user.isOnline()){
+				retVal.add(user);
+			}
+		}
+		
+		return retVal;
 	}
 }

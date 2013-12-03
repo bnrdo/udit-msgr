@@ -1,5 +1,7 @@
 package com.bnrdo.uditmsgr.dao;
 
+import java.util.List;
+
 import com.bnrdo.uditmsgr.domain.Message;
 import com.bnrdo.uditmsgr.domain.Update;
 import com.bnrdo.uditmsgr.domain.User;
@@ -13,4 +15,7 @@ public interface ChatRepository {
 	void offlineSubscriber(User user);
 	void loadOnlineSubscribersForUserView(User user);
 	void loadAllMessagesForUserView(User user);
+	boolean isUsernameExisting(String userName);
+	List<User> getOnlineSubcribers();
+	List<User> getOfflineSubcribers();
 }

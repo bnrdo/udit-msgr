@@ -24,4 +24,9 @@ public class UserUpdate extends Update {
 	public UpdateType getUpdateType() {
 		return UpdateType.USER_UPDATE;
 	}
+	
+	@Override
+	public String toString(){
+		return "Update : User update | User : name=" + user.getUserName() + ", ipAddress=" + user.getIpAddress() + ", online=" + user.isOnline();
+	}
 }

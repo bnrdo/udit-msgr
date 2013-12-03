@@ -1,0 +1,240 @@
+@CHARSET "ISO-8859-1";
+
+* {
+	margin: 0px;
+	padding: 0px;
+}
+.compose-area{
+	padding: 5px 5px 5px 5px;
+}
+.participants-area{
+	border-bottom: 1px solid gray;
+	border-right: 1px solid gray;
+	border-top: 1px solid gray;
+	color: #00000;
+	display: inline-block;
+	font-family: Verdana;
+	font-size: 10px;
+	height: 300px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	text-decoration: none;
+	width: 100%;
+}
+
+.participants-area div{
+	padding: 2px 2px 2px 5px;
+}
+
+.messages-area{
+	border: 1px solid gray;
+	display: inline-block;
+	height: 300px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	width: 100%;
+}
+
+.messages-area div{
+	padding: 2px 2px 2px 2px;
+}
+
+.top-options-imgs:hover {
+	outline: 1px solid gray;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.top-options-container {
+	min-height: 40px;
+	line-height: 1;
+	background-color: #eaeaea;
+	background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+	background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+	background-image: linear-gradient(#fafafa, #eaeaea);
+	background-repeat: repeat-x;
+	border: 1px solid #d5d5d5;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.top-options-subtitle{
+	color: rgb(108, 113, 122);
+	display: block;
+	font-family: arial,helvetica,clean,sans-serif;
+	font-size: 10px;
+	font-size-adjust: none;
+	font-stretch: normal;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 13.6px;
+	list-style-image: none;
+	list-style-position: outside;
+	list-style-type: none;
+	margin-left: 3px;
+	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: hidden;
+	padding-left: 1px;
+	text-decoration: none;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	-moz-font-feature-settings: normal;
+	-moz-font-language-override: normal;
+	-moz-text-blink: none;
+	-moz-text-decoration-color: rgb(108, 113, 122);
+	-moz-text-decoration-line: none;
+	-moz-text-decoration-style: solid;
+
+}
+
+.top-options-title {
+	color: rgb(85, 85, 85);
+	float: left;
+	font-family: Helvetica, arial, freesans, clean, sans-serif;
+	font-size: 15px;
+	font-size-adjust: none;
+	font-stretch: normal;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 700;
+	margin-left: 4px;
+	margin-top: 7px;
+	-moz-font-feature-settings: normal;
+	-moz-font-language-override: normal;
+}
+
+.top-options-font {
+	color: #BEFFDF;
+	font-family: Verdana;
+	font-size: 10px;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.top-options-background {
+	background-color: #0E7241;
+}
+
+.border-none {
+	border: none;
+}
+
+.chatTextArea {
+	resize: none;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.font-gray {
+	color: #5A696B !important;
+}
+
+.message {
+	color: #00000;
+	font-family: Verdana;
+	font-size: 10px;
+	height: 16px;
+	text-decoration: none;
+}
+
+.user-said {
+	color: #00000;
+	font-family: Verdana;
+	font-size: 10px;
+	font-weight: bold;
+	height: 16px;
+	text-decoration: none;
+}
+
+.user-online {
+	color: #00000;
+	font-family: Verdana;
+	font-size: 10px;
+	height: 16px;
+	text-decoration: none;
+}
+
+
+#btnSend {
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+#chatArea {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+
+#registerArea {
+	border: 1px solid green;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+
+.display-none {
+	display: none;
+}
+
+.magin-bottom-10 {
+	margin-bottom: 10px;
+}
+
+.padding-5 {
+	padding: 5px 5px 5px 5px;
+}
+
+.padding-10 {
+	padding: 10px 10px 10px 10px;
+}
+
+.padding-top-10 {
+	padding-top: 10px;
+}
+
+.padding-bottom-10 {
+	padding-bottom: 10px;
+}
+
+.padding-top-right-10 {
+	padding: 10px 10px 0px 0px;
+}
+
+.padding-top5-right10-bottom5 {
+	padding: 5px 10px 5px 0px;
+}
+
+.padding-top5-left10-bottom5 {
+	padding: 5px 0px 5px 10px;
+}
+
+.padding-top-right-bottom-10 {
+	padding: 10px 10px 10px 0px;
+}
+
+.padding-top-right-bottom-5 {
+	padding: 5px 5px 5px 0px;
+}
+
+.padding-top-right-left-10 {
+	padding: 10px 10px 0px 10px;
+}
+
+.white-button {
+	background-color: white;
+	color: #888888;
+	border-spacing: 0;
+	border-collapse: collapse;
+	border: ridge 1px #888888;
+}

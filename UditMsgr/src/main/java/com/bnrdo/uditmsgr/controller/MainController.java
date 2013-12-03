@@ -25,46 +25,28 @@ public class MainController {
 	
 	@RequestMapping(value = "/main.htm", method = RequestMethod.GET)
     protected String showChat(HttpServletRequest request, ModelMap model) throws Exception {
-		
-		//-- test code
-		/*String theMockPoint = request.getParameter("userName");
-		  
-		if(theMockPoint != null){
-			String ipAddress = theMockPoint.split("-")[1];
-			
-			//String ipAddress = request.getRemoteAddr();
-			User user = repo.findUserByIp(ipAddress);
-			
-			if(user != null){
-				model.addAttribute("user", theMockPoint);
-				repo.onlineSubscriber(user);
-				repo.loadOnlineSubscribersForUserView(user);
-				//repo.loadAllMessagesForUserView(user);
-			}
-		}*/
-		//-- end test code
-		
 		String ipAddress = request.getRemoteAddr();
 		User user = repo.findUserByIp(ipAddress);
 		
 		if(user != null){
 			if(!user.isOnline()){
 				model.addAttribute("user", user.getUserName());
+				model.addAttribute("userIp", user.getIpAddress());
 				repo.onlineSubscriber(user);
 				repo.loadOnlineSubscribersForUserView(user);
+				
+				return "chatbox";
 			}else{
-				return "you-are-already";
+				//return "you-are-already";
+				return "chatbox";
 			}
 		}
 		
-		return "main";
+		return "login";
 	}
 	
 	@RequestMapping(value = "/fetchUpdates.htm", method = RequestMethod.GET)
     protected @ResponseBody String fetchUpdates(HttpServletRequest request) throws Exception {
-		/*String theMockPoint = request.getParameter("userName");
-		String userName = theMockPoint.split("-")[0];
-		String ipAddress = theMockPoint.split("-")[1];*/
 		
 		String userName = request.getParameter("userName");
 		String ipAddress = request.getRemoteAddr();
@@ -73,7 +55,7 @@ public class MainController {
 		
 		Update update = repo.getUpdate(new User(userName, ipAddress));
 		
-		System.out.println("|------------------------------------------------ just got an update : " + update);
+		System.out.println("|------------------------------------------------ just got an update for " + userName + " : " + update);
 		
 		ObjectMapper mapper = new ObjectMapper();
 		String response = "";
@@ -95,9 +77,6 @@ public class MainController {
 	
 	@RequestMapping(value = "/sendMessage.htm", method = RequestMethod.POST)
     protected @ResponseBody String sendMessage(HttpServletRequest request) throws Exception {
-		/*String theMockPoint = request.getParameter("userName");
-		String userName = theMockPoint.split("-")[0];
-		String ipAddress = theMockPoint.split("-")[1];*/
 		
 		String userName = request.getParameter("userName");
 		String ipAddress = request.getRemoteAddr();
@@ -108,32 +87,37 @@ public class MainController {
 		
 		return "OK";
 	}
-	//problem is, nagsstretch din ung div pag nag exceed ung content, kasi nga naka width 100% sya, jusko panu kaya un. ahuhuhuhuhuhu
+	
 	@RequestMapping(value = "/registerUser.htm", method = RequestMethod.GET)
-	protected String registerUser(HttpServletRequest request){
-		/*String theMockPoint = request.getParameter("userName");
-		String userName = theMockPoint.split("-")[0];
-		String ipAddress = theMockPoint.split("-")[1];*/
+	protected String registerUser(HttpServletRequest request, ModelMap model){
 		
-		String userName = request.getParameter("userName");
+		String userName = request.getParameter("userName").trim();
 		String ipAddress = request.getRemoteAddr();
+		boolean isUsernameTaken = repo.isUsernameExisting(userName);
 		
-		//chatService.saveUser(newUserId, ipAddress);
-		repo.subscribe(new User(userName, ipAddress));
-		
-		//return "redirect:/main.htm?userName=" + theMockPoint;
-		return "redirect:/main.htm";
+		if(!isUsernameTaken){
+			repo.subscribe(new User(userName, ipAddress));
+			return "redirect:/main.htm";
+		}else{
+			model.addAttribute("isUsernameTaken", true);
+			model.addAttribute("user", userName);
+			return "login";
+		}
 	}
 	
-	@RequestMapping(value = "/offlineUser.htm", method = RequestMethod.POST)
-	protected void offlineUser(HttpServletRequest request){
-		/*String theMockPoint = request.getParameter("userName");
-		String userName = theMockPoint.split("-")[0];
-		String ipAddress = theMockPoint.split("-")[1];*/
+	@RequestMapping(value = "/logout.htm", method = RequestMethod.POST)
+	protected @ResponseBody String logout(HttpServletRequest request){
 		
 		String userName = request.getParameter("userName");
 		String ipAddress = request.getRemoteAddr();
 		
 		repo.offlineSubscriber(new User(userName, ipAddress));
+		
+		return "OK";
+	}
+	
+	@RequestMapping(value = "/showLogoutPage.htm", method = RequestMethod.GET)
+	protected String showLogoutPage(HttpServletRequest request){
+		return "logout";
 	}
 }

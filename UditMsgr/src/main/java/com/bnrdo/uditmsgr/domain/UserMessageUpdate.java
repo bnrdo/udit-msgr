@@ -22,4 +22,11 @@ public class UserMessageUpdate extends Update{
 	public UpdateType getUpdateType() {
 		return UpdateType.MESSAGE_UPDATE;
 	}
+	
+	@Override
+	public String toString(){
+		User user = userMessage.getUser();
+		Message msg = userMessage.getMessage();
+		return "Update : Message update | User : name=" + user.getUserName() + ", ipAddress=" + user.getIpAddress() + " | Message : " + msg.getContent();
+	}
 }
