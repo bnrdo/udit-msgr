@@ -56,7 +56,9 @@ public class MainController {
 		Update update = repo.getUpdate(new User(userName, ipAddress));
 		
 		System.out.println("|------------------------------------------------ just got an update for " + userName + " : " + update);
-		
+		/*nahinto ako sa, pag close using browser x then punta ulit ng site dapat parang mininimize lang, 
+		pag linogout then pag punta ulit ng chatbox login screen ulit. ung magiging icon ng user sa participants list
+		mag decide anu itsura pag naka x lang or naka log out?*/
 		ObjectMapper mapper = new ObjectMapper();
 		String response = "";
 		
@@ -119,5 +121,19 @@ public class MainController {
 	@RequestMapping(value = "/showLogoutPage.htm", method = RequestMethod.GET)
 	protected String showLogoutPage(HttpServletRequest request){
 		return "logout";
+	}
+	
+	@RequestMapping(value = "/changeName.htm", method = RequestMethod.POST)
+	protected @ResponseBody String changeName(HttpServletRequest request){
+		String userName = request.getParameter("userName");
+		String newName = request.getParameter("newName");
+		
+		if(repo.isUsernameExisting(newName)){
+			return "User name already exists!";
+		}else{
+			repo.changeUserName(userName, newName);
+		}
+		
+		return "OK";
 	}
 }

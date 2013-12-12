@@ -36,7 +36,9 @@ public class ChatRepositoryImpl implements ChatRepository{
 	@Override
 	public void subscribe(User user) {
 		subscribers.add(user);
-		_Q.put(user, new LinkedBlockingQueue<Update>());
+		
+		//make sure to defensive copy the user to be used as the key of the user's q to so that when user in subscribers list is modified, the key in _Q is not modified
+		_Q.put(new User(user), new LinkedBlockingQueue<Update>()); 
 		
 		DatabaseUtil.executeStatement("INSERT INTO USER(USERNAME, IP_ADDRESS) VALUES('" + user.getUserName() + "','" + user.getIpAddress() + "')");
 	}
@@ -60,6 +62,7 @@ public class ChatRepositoryImpl implements ChatRepository{
 		return update;
 	}
 
+	
 	@Override
 	public void saveChatMessage(User user, Message message) {
 		userMessages.add(new UserMessage(user, message));
@@ -202,5 +205,55 @@ public class ChatRepositoryImpl implements ChatRepository{
 		}
 		
 		return retVal;
+	}
+
+	@Override
+	public void changeUserName(String currentUserName, String newUserName) {
+		User oldUserForRemoval = null;
+		
+		for(User user : subscribers){
+			if(user.getUserName().equals(currentUserName)){
+				user.setUserName(newUserName);
+				break;
+			}
+		}
+		
+		boolean successfullyReplaced = false;
+		
+		for(Entry<User, BlockingQueue<Update>> s : _Q.entrySet()){
+			if(s.getKey().getUserName().equals(currentUserName)){
+				//do not just get & update the key because it will not work.
+				//create a new User object then modify the name field with the
+				//new one the put in the _Q. the old user object will be removed later
+				User u = s.getKey();
+				oldUserForRemoval = new User(u);
+				User newUser = new User(u);
+				newUser.setUserName(newUserName);
+				
+				_Q.put(newUser, s.getValue());
+				successfullyReplaced = true;
+				break;
+			}
+		}
+		
+		if(successfullyReplaced && oldUserForRemoval != null)
+			_Q.remove(oldUserForRemoval);
+	}
+	
+	public static void main(String[] args) {
+		Map<User, String> map = new HashMap<User, String>();
+		map.put(new User("abc", "123"), "The message");
+		
+		System.out.println(map.get(new User("abc", "123")));
+		
+		for(Entry<User, String> s : map.entrySet()){
+			User user2 = new User(s.getKey());
+			user2.setUserName("hij");
+			
+			map.put(user2, s.getValue());
+			
+		}
+		
+		System.out.println(map.get(new User("hij", "123")));
 	}
 }

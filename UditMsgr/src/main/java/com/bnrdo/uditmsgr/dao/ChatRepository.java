@@ -15,6 +15,7 @@ public interface ChatRepository {
 	void offlineSubscriber(User user);
 	void loadOnlineSubscribersForUserView(User user);
 	void loadAllMessagesForUserView(User user);
+	void changeUserName(String currentUserName, String newUserName);
 	boolean isUsernameExisting(String userName);
 	List<User> getOnlineSubcribers();
 	List<User> getOfflineSubcribers();

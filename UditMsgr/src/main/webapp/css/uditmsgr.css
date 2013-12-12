@@ -73,7 +73,7 @@
 	list-style-image: none;
 	list-style-position: outside;
 	list-style-type: none;
-	margin-left: 3px;
+	margin-left: 2px;
 	overflow: hidden;
 	overflow-x: hidden;
 	overflow-y: hidden;
@@ -90,6 +90,10 @@
 
 }
 
+.top-options-confirm{
+	
+}
+
 .top-options-title {
 	color: rgb(85, 85, 85);
 	float: left;
@@ -101,11 +105,16 @@
 	font-variant: normal;
 	font-weight: 700;
 	margin-left: 4px;
-	margin-top: 7px;
 	-moz-font-feature-settings: normal;
 	-moz-font-language-override: normal;
 }
-
+.top-options-confirm-font{
+	color: rgb(108, 113, 122);
+	font-family: Verdana;
+	font-size: 9px;
+	font-weight: normal;
+	text-decoration: none;
+}
 .top-options-font {
 	color: #BEFFDF;
 	font-family: Verdana;
@@ -127,6 +136,27 @@
 	width: 100%;
 	height: 100%;
 	box-sizing: border-box;
+}
+
+.change-user-text{
+	float:left; 
+	height:13px; 
+	width: 80px; 
+	font-family: Verdana, sans-serif; 
+	font-size: 12px;'
+}
+
+.main-logo{
+	float:right; 
+	margin-left:10px;
+}
+
+.float-left{
+	float: left;
+}
+
+.float-right{
+	float: right;
 }
 
 .font-black {

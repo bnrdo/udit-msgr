@@ -6,6 +6,12 @@ public class User{
 	private String ipAddress;
 	private boolean online;
 	
+	public User(User user){
+		this.userName = user.getUserName();
+		this.ipAddress = user.getIpAddress();
+		this.online = user.isOnline();
+	}
+	
 	public User(String userName, String ipAddress){
 		this.userName = userName;
 		this.ipAddress = ipAddress;

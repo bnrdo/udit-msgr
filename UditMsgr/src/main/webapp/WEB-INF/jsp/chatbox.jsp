@@ -15,24 +15,37 @@
 		<script type='text/javascript'>
 		
 			window.onresize = function(){
-			    window.resizeTo(408,491);
+			    //window.resizeTo(408,491);
 			};
 
 			var d = document;
+			var ctxPath;
 			var sendMessageTextA;
 			var displayMessageTextA;
 			var participantsListTextA;
+			var userNameContainer;
 			var userName;
+			
+			var displayUserDiv;
+			var changeUserDiv;
 		
 			function onloadHook(){
 				userName = "${user}";
-				
+				ctxPath = '<c:out value="${pageContext.request.contextPath}"/>';
+				userNameContainer = d.getElementById("userNameContainer");
 				sendMessageTextA = d.getElementById("chatSendMessageTextArea");
 				displayMessageTextA = d.getElementById("chatDisplayMessageTextArea");
 				participantsListTextA = d.getElementById("chatParticipantsListTextArea");
 				
+				displayUserDiv = d.getElementById('display-user');
+				changeUserDiv = d.getElementById('change-user');
+				
 				sendMessageTextA.onkeydown = sendMessageByKeypress;
 				sendMessageTextA.focus();
+				
+				$(window).bind('beforeunload', function(){
+					forceLogout(userName, 'window closed');
+				});
 				
 				fetchUpdates();	
 			}
@@ -102,7 +115,7 @@
 			}
 			
 			function stylizeParticipant(name, isOnline){
-				return "<table border=0 cellSpacing=0 cellPadding=0 width='100%' style='float:left;'><tr><td width='20px' align='left'><img src='<c:out value="${pageContext.request.contextPath}"/>/images/user_online.png'/></td><td align='left' class='font-black'>" + name + "</td></tr></table>";
+				return "<table border=0 cellSpacing=0 cellPadding=0 width='100%' style='float:left;'><tr><td width='20px' align='left'><img src='" + ctxPath + "/images/user_online.png'/></td><td align='left' class='font-black'>" + name + "</td></tr></table>";
 			}
 			
 			function sendMessage(){
@@ -149,6 +162,29 @@
 				}
 			}
 			
+			function forceLogout(uname, reason){
+				$.ajax({
+					cache: false,
+					type: 'POST',
+					url: 'logout.htm',
+					async: false,
+					data: {
+						"userName" : uname,
+						"reason" : reason
+					},
+					success : function(data){
+						if(data === "OK"){
+							if(reason === "name change")
+							alert("Name successfully changed. Please login again for the changes to take effect.");
+							window.location.href = "showLogoutPage.htm";
+						}
+						else{
+							alert("Something serious happened. Please tell Bernardo.");
+						}
+					}
+				});
+			}
+			
 			function onlineUser(name, isOnline){
 				var existingContent = participantsListTextA.innerHTML;
 				var participants = existingContent.split("<br>");
@@ -188,7 +224,52 @@
 			}
 			
 			function editName(){
+				displayUserDiv.style.display = 'none';
+				changeUserDiv.style.display = 'block';
 				
+				d.getElementById("txtEditName").select();
+			}
+			
+			function cancelEditName(){
+				displayUserDiv.style.display = 'block';
+				changeUserDiv.style.display = 'none';
+			}
+			
+			function saveEditedName(){
+				var newName = d.getElementById("txtEditName").value;
+				
+				if(userName === newName){
+					alert("Nothing has changed.");
+				}else{
+					
+					var choice = confirm("Warning. On success, system will log you out for the username change to take effect. Continue?");
+					
+					if(choice){
+						$.ajax({
+							cache: false,
+							type: 'POST',
+							url: 'changeName.htm',
+							data: {
+								"userName" : userName,
+								"newName" : newName
+							},
+							success : function(data){
+								if(data === "OK")
+									forceLogout(newName, "name change");
+								else{
+									alert(data);
+									
+									var txt = d.getElementById("txtEditName");
+									
+									txt.value = userName; 
+									txt.select();
+								}
+							}
+						});
+					}else{
+						return;
+					}
+				}
 			}
 		</script>
 	</head>
@@ -198,19 +279,30 @@
 			<table border=0 cellSpacing=0 cellPadding=0 height="100%" width="100%">
 				<tr>
 					<td colspan="2">
-						<div class="top-options-container" style="padding-top: 5px; padding-right: 5px;">
-							<div style="float:left;">
+						<div class="top-options-container" style="padding-top: 7px; padding-right: 5px;">
+							<div style="float:left;" id="display-user">
 								<table border=0 cellSpacing=0 cellPadding=0 height="100%" width="100%">
-									<tr><td rowspan="3"><img src='<c:out value="${pageContext.request.contextPath}"/>/images/logo.png' style="float:right; margin-top:3px; margin-left:10px;"></td></tr>
-									<tr><td class="top-options-title"><c:out value="${user}"/></td></tr>
-									<tr><td class="top-options-subtitle"><c:out value="${userIp}"/></td></tr>
+									<tr><td rowspan="3"><img src='<c:out value="${pageContext.request.contextPath}"/>/images/logo.png' class='main-logo'></td></tr>
+									<tr><td class="top-options-title" align="left"><c:out value="${user}"/></td></tr>
+									<tr><td class="top-options-subtitle" align="left"><c:out value="${userIp}"/></td></tr>
 								</table>
 							</div>
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/logout.png' style="float:right; margin-top:7px;" class="top-options-imgs" onclick="logout()">
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/settings.png' style="float:right; margin-right: 5px; margin-top:7px;" class="top-options-imgs">
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/attach.png' style="float:right; margin-right: 8px; margin-top:7px;" class="top-options-imgs">
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/smiley.png' style="float:right; margin-right: 8px; margin-top:7px;" class="top-options-imgs">
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/pen.png' style="float:right; margin-right: 8px; margin-top:7px;" class="top-options-imgs" onclick="editName()">
+							<div style="float:left; display:none;" id="change-user">
+								<table border=0 cellSpacing=0 cellPadding=0 height="100%" width="100%">
+									<tr><td rowspan="3"><img src='<c:out value="${pageContext.request.contextPath}"/>/images/logo.png' class='main-logo'></td></tr>
+									<tr><td class="top-options-title" align="left" valign="bottom">
+										<input type='text' id='txtEditName' value='<c:out value="${user}"/>' class='change-user-text'/>
+										<img onclick='saveEditedName()' class='float-left top-options-imgs' src='<c:out value="${pageContext.request.contextPath}"/>/images/check.png' class='top-options-imgs'/>
+										<img onclick='cancelEditName()' class='float-left top-options-imgs' src='<c:out value="${pageContext.request.contextPath}"/>/images/cancel.png' class='top-options-imgs'/>
+									</td></tr>
+									<tr><td class="top-options-subtitle" align="left"><c:out value="${userIp}"/></td></tr>
+								</table>
+							</div>
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/logout.png' style="margin-top:7px;" class="top-options-imgs float-right" onclick="logout()">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/settings.png' style="margin-right: 5px; margin-top:7px;" class="top-options-imgs float-right">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/attach.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/smiley.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/pen.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right" onclick="editName()">
 						</div>
 					</td>
 				</tr>
