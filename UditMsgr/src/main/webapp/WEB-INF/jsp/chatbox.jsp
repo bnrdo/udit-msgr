@@ -44,7 +44,7 @@
 				sendMessageTextA.focus();
 				
 				$(window).bind('beforeunload', function(){
-					forceLogout(userName, 'window closed');
+					//note matitrigger din toh pag nag logout via confirmation
 				});
 				
 				fetchUpdates();	
@@ -65,12 +65,12 @@
 						if(updateType === "USER_UPDATE"){
 							var ip = resp["user"]["ipAddress"];
 							var name = resp["user"]["userName"];
-							var isUserOnline = resp["user"]["online"];
+							var status = resp["user"]["status"];
 							
-							toggleUser(name, isUserOnline);
+							toggleUser(name, status);
 							
 							//do not fetch update if the current update received is the user himself getting offline
-							if(!(name == userName && !isUserOnline))
+							if(!(name == userName && status == "OFFLINE"))
 								fetchUpdates();
 						}else if(updateType === "MESSAGE_UPDATE"){
 							var userNam = resp["userMessage"]["user"]["userName"];
@@ -88,12 +88,13 @@
 				});
 			}
 			
-			function toggleUser(name, isOnline){
-				if(isOnline){
+			function toggleUser(name, status){
+				
+				if(status === "ONLINE"){
 					if(isUserAlreadyIntheList(name)){
 						onlineUser(name, true);
 					}else{
-						participantsListTextA.innerHTML += stylizeParticipant(name, isOnline) + "<br/>";
+						participantsListTextA.innerHTML += stylizeParticipant(name, status) + "<br/>";
 					}
 				}else{
 					onlineUser(name, false);
@@ -138,51 +139,34 @@
 				});
 			}
 			
-			function logout(e){
+			function confirmLogout(e){
 				var choice = confirm("Close?");
 				
 				if(choice === true){
-					$.ajax({
-						cache: false,
-						type: 'POST',
-						url: 'logout.htm',
-						data: {
-							"userName" : userName
-						},
-						success : function(data){
+					logout(userName, 
+						function(data){
 							if(data === "OK")
 								window.location.href = "showLogoutPage.htm";
 							else{
 								alert("Something serious happened. Please tell Bernardo.");
 							}
 						}
-					}); 
+					);
 				}else{
 					e.preventDefault();
 				}
 			}
 			
-			function forceLogout(uname, reason){
+			function logout(userName, successCallback){
 				$.ajax({
 					cache: false,
 					type: 'POST',
 					url: 'logout.htm',
-					async: false,
 					data: {
-						"userName" : uname,
-						"reason" : reason
+						"userName" : userName
 					},
-					success : function(data){
-						if(data === "OK"){
-							if(reason === "name change")
-							alert("Name successfully changed. Please login again for the changes to take effect.");
-							window.location.href = "showLogoutPage.htm";
-						}
-						else{
-							alert("Something serious happened. Please tell Bernardo.");
-						}
-					}
-				});
+					success : successCallback
+				}); 
 			}
 			
 			function onlineUser(name, isOnline){
@@ -254,10 +238,19 @@
 								"newName" : newName
 							},
 							success : function(data){
-								if(data === "OK")
-									forceLogout(newName, "name change");
+								if(data === "OK"){
+									logout(newName, function(data){
+										if(data === "OK"){
+											if(reason === "name change")
+											alert("Name successfully changed. Please login again for the changes to take effect.");
+											window.location.href = "showLogoutPage.htm";
+										}
+										else{
+											alert("Something serious happened. Please tell Bernardo.");
+										}
+									});
+								}
 								else{
-									alert(data);
 									
 									var txt = d.getElementById("txtEditName");
 									
@@ -298,7 +291,7 @@
 									<tr><td class="top-options-subtitle" align="left"><c:out value="${userIp}"/></td></tr>
 								</table>
 							</div>
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/logout.png' style="margin-top:7px;" class="top-options-imgs float-right" onclick="logout()">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/logout.png' style="margin-top:7px;" class="top-options-imgs float-right" onclick="confirmLogout()">
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/settings.png' style="margin-right: 5px; margin-top:7px;" class="top-options-imgs float-right">
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/attach.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right">
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/smiley.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right">

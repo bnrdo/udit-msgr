@@ -1,15 +1,17 @@
 package com.bnrdo.uditmsgr.domain;
 
+import com.bnrdo.uditmsgr.util.Constants.Status;
+
 public class User{
 	
 	private String userName;
 	private String ipAddress;
-	private boolean online;
+	private Status status;
 	
 	public User(User user){
 		this.userName = user.getUserName();
 		this.ipAddress = user.getIpAddress();
-		this.online = user.isOnline();
+		this.status = user.getStatus();
 	}
 	
 	public User(String userName, String ipAddress){
@@ -32,13 +34,13 @@ public class User{
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	
-	public boolean isOnline() {
-		return online;
+
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setOnline(boolean online) {
-		this.online = online;
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 	@Override

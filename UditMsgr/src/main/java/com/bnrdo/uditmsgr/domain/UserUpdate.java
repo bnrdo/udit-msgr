@@ -9,7 +9,7 @@ public class UserUpdate extends Update {
 	
 	public UserUpdate(User user){
 		this.user = new User(user.getUserName(), user.getIpAddress());
-		this.user.setOnline(user.isOnline());
+		this.user.setStatus(user.getStatus());
 	}
 	
 	public User getUser() {
@@ -27,6 +27,6 @@ public class UserUpdate extends Update {
 	
 	@Override
 	public String toString(){
-		return "Update : User update | User : name=" + user.getUserName() + ", ipAddress=" + user.getIpAddress() + ", online=" + user.isOnline();
+		return "Update : User update | User : name=" + user.getUserName() + ", ipAddress=" + user.getIpAddress() + ", status=" + user.getStatus();
 	}
 }

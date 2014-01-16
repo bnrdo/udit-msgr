@@ -10,22 +10,17 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 		<title>Login</title>
-		<link rel="stylesheet" type="text/css" href='<c:out value="${pageContext.request.contextPath}"/>/css/uditmsgr.css' />
+		<link rel="stylesheet" type="text/css" href='<c:out value="${pageContext.request.contextPath}"/>/css/uditmsgr.css?t=<?= time(); ?>' />
 		<script src='<c:out value="${pageContext.request.contextPath}"/>/js/jquery.min.js'></script>
 		<script type='text/javascript'>
 		
 			var d = document;
-			var newUserTextB;
+			var userNameTextB;
 			
 			function onloadHook(){
-				newUserTextB = d.getElementById("txtUserID");
-				newUserTextB.onkeydown = registerUserByKeyPress;
-				newUserTextB.focus();
-				
-				if("${isUsernameTaken}" !== "" && 
-						"${isUsernameTaken}" !== null){
-					alert("Username ${user} is already taken. Please choose another.");
-				}
+				userNameTextB = d.getElementById("txtUserID");
+				userNameTextB.onkeydown = loginUserByKeyPress;
+				userNameTextB.focus();
 			}
 			
 			function isUserNew(){
@@ -37,19 +32,65 @@
 		
 			function registerUser(){
 				
-				var newUserID = newUserTextB.value;
+				var newUserID = userNameTextB.value;
 				
 				if(newUserID.trim() === ''){
 					alert("Username should not be blank");
 					return;
 				}
 				
-				window.location.href = 'registerUser.htm?userName=' + newUserID;
+				$.ajax({
+					cache: false,
+					type: 'POST',
+					url: 'registerUser.htm',
+					data: {
+						"userName" : newUserID
+					},
+					success : function(data){
+						if(data === "OK"){
+							alert("Successfully registered! You will now be logged in as " + newUserID);
+							window.location.href = 'main.htm';
+						}else{
+							alert(data);
+						}
+					}
+				});
+			}
+			
+			function loginUser(){
+				var userID = userNameTextB.value;
+				
+				if(userID.trim() === ''){
+					alert("Username should not be blank");
+					return;
+				}
+				
+				$.ajax({
+					cache: false,
+					type: 'POST',
+					url: 'login.htm',
+					data: {
+						"userName" : userID
+					},
+					success : function(data){
+						if(data === "OK"){
+							window.location.href = 'main.htm';
+						}else{
+							alert(data);
+						}
+					}
+				});
 			}
 			
 			function registerUserByKeyPress(e){
 				if (e.keyCode == 13){
 					registerUser();
+			    }
+			}
+			
+			function loginUserByKeyPress(e){
+				if (e.keyCode == 13){
+					loginUser();
 			    }
 			}
 			
@@ -62,8 +103,28 @@
 				<tr>
 					<td align="center">
 						<table>
-							<tr><td width="100%" align="center" valign="middle"><input type="text" id="txtUserID" class="magin-bottom-10"/></td></tr>
-							<tr><td width="100%" align="center" valign="middle"><input type="button" class="white-button" onclick="registerUser()" value="Register"/></td></tr>
+							<tr>
+								<td>
+									<div style="float:left;" id="display-user">
+									<table border=0 cellSpacing=0 cellPadding=0 height="100%" width="100%">
+										<tr><td rowspan="3" valign="top"><img src='<c:out value="${pageContext.request.contextPath}"/>/images/login64.png' class='main-logo'></td></tr>
+										<tr><td class="padding-left-7" align="left"><input type="text" id="txtUserID" class='margin-left-neg-30'/></td></tr>
+										<tr><td class="top-options-subtitle" align="right"><span class='margin-left-neg-30'>Your IP : <c:out value="${userIp}"/></span></td></tr>
+									</table>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="magin-bottom-10">
+									&nbsp;
+								</td>
+							</tr>
+							<tr>
+								<td width="100%" align="right" valign="middle">
+									<input type="button" class="white-button" onclick="loginUser()" value="   Login   "/>
+									<input type="button" class="white-button" onclick="registerUser()" value="  Register "/>
+								</td>
+							</tr>
 						</table>
 					</td>
 				</tr>

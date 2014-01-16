@@ -10,34 +10,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.bnrdo.uditmsgr.dao.ChatRepository;
 import com.bnrdo.uditmsgr.domain.Message;
+import com.bnrdo.uditmsgr.domain.TerminateUpdate;
 import com.bnrdo.uditmsgr.domain.Update;
 import com.bnrdo.uditmsgr.domain.User;
 import com.bnrdo.uditmsgr.domain.UserMessageUpdate;
 import com.bnrdo.uditmsgr.domain.UserUpdate;
+import com.bnrdo.uditmsgr.repo.DataStore;
+import com.bnrdo.uditmsgr.service.ChatService;
+import com.bnrdo.uditmsgr.service.UpdateService;
+import com.bnrdo.uditmsgr.util.Constants.Status;
 
 @Controller
 public class MainController {
 	
 	@Autowired
-	private ChatRepository repo;
+	private ChatService chatSvc;
+	
+	@Autowired
+	private UpdateService updateSvc;
 	
 	@RequestMapping(value = "/main.htm", method = RequestMethod.GET)
     protected String showChat(HttpServletRequest request, ModelMap model) throws Exception {
 		String ipAddress = request.getRemoteAddr();
-		User user = repo.findUserByIp(ipAddress);
+		User user = chatSvc.findUserByIp(ipAddress);
+		
+		model.addAttribute("userIp", ipAddress);
 		
 		if(user != null){
-			if(!user.isOnline()){
-				model.addAttribute("user", user.getUserName());
-				model.addAttribute("userIp", user.getIpAddress());
-				repo.onlineSubscriber(user);
-				repo.loadOnlineSubscribersForUserView(user);
+			
+			model.addAttribute("user", user.getUserName());
+			Status status = user.getStatus();
+			
+			if(status.equals(Status.ONLINE)){
+				chatSvc.loadOnlineSubscribersForUserView(user);
 				
-				return "chatbox";
-			}else{
-				//return "you-are-already";
 				return "chatbox";
 			}
 		}
@@ -53,9 +60,15 @@ public class MainController {
 		
 		System.out.println("|------------------------------------------------ fetch from " + userName);
 		
-		Update update = repo.getUpdate(new User(userName, ipAddress));
+		System.out.println("DataStore before the take : " + DataStore._Q);
+		
+		Update update = updateSvc.getUpdate(new User(userName, ipAddress));
+		
+		System.out.println("DataStore after the take : " + DataStore._Q);
 		
 		System.out.println("|------------------------------------------------ just got an update for " + userName + " : " + update);
+		
+		
 		/*nahinto ako sa, pag close using browser x then punta ulit ng site dapat parang mininimize lang, 
 		pag linogout then pag punta ulit ng chatbox login screen ulit. ung magiging icon ng user sa participants list
 		mag decide anu itsura pag naka x lang or naka log out?*/
@@ -72,6 +85,11 @@ public class MainController {
 				UserMessageUpdate userMessageUpdate = (UserMessageUpdate) update;
 				response = mapper.writeValueAsString(userMessageUpdate);
 				break;
+				
+			case TERMINATE:
+				TerminateUpdate terminateUpdate = (TerminateUpdate) update;
+				response = mapper.writeValueAsString(terminateUpdate);
+				break;
 		}
 	
 		return response;
@@ -85,25 +103,30 @@ public class MainController {
 		
 		String message = request.getParameter("message");
 		
-		repo.saveChatMessage(new User(userName, ipAddress), new Message(message));
+		chatSvc.saveChatMessage(new User(userName, ipAddress), new Message(message));
 		
 		return "OK";
 	}
 	
-	@RequestMapping(value = "/registerUser.htm", method = RequestMethod.GET)
-	protected String registerUser(HttpServletRequest request, ModelMap model){
+	@RequestMapping(value = "/registerUser.htm", method = RequestMethod.POST)
+	protected @ResponseBody String registerUser(HttpServletRequest request, ModelMap model){
 		
 		String userName = request.getParameter("userName").trim();
 		String ipAddress = request.getRemoteAddr();
-		boolean isUsernameTaken = repo.isUsernameExisting(userName);
+		
+		boolean isUsernameTaken = chatSvc.isUsernameExisting(userName);
 		
 		if(!isUsernameTaken){
-			repo.subscribe(new User(userName, ipAddress));
-			return "redirect:/main.htm";
+			User user = new User(userName, ipAddress);
+			chatSvc.registerUser(user);
+			chatSvc.onlineUser(user);
+			//return "redirect:/main.htm";
+			return "OK";
 		}else{
-			model.addAttribute("isUsernameTaken", true);
-			model.addAttribute("user", userName);
-			return "login";
+			//model.addAttribute("isUsernameTaken", true);
+			//model.addAttribute("user", userName);
+			//return "login";
+			return "Username already exists";
 		}
 	}
 	
@@ -113,9 +136,25 @@ public class MainController {
 		String userName = request.getParameter("userName");
 		String ipAddress = request.getRemoteAddr();
 		
-		repo.offlineSubscriber(new User(userName, ipAddress));
+		chatSvc.offlineUser(new User(userName, ipAddress));
 		
 		return "OK";
+	}
+	
+	@RequestMapping(value = "/login.htm", method = RequestMethod.POST)
+	protected @ResponseBody String login(HttpServletRequest request){
+		
+		String userName = request.getParameter("userName");
+		String ipAddress = request.getRemoteAddr();
+		
+		boolean isUsernamevalid = chatSvc.isUsernameExisting(userName);
+		
+		if(!isUsernamevalid){
+			return "Username is not registered.";
+		}else{
+			chatSvc.onlineUser(new User(userName, ipAddress));
+			return "OK";
+		}
 	}
 	
 	@RequestMapping(value = "/showLogoutPage.htm", method = RequestMethod.GET)
@@ -128,10 +167,10 @@ public class MainController {
 		String userName = request.getParameter("userName");
 		String newName = request.getParameter("newName");
 		
-		if(repo.isUsernameExisting(newName)){
+		if(chatSvc.isUsernameExisting(newName)){
 			return "User name already exists!";
 		}else{
-			repo.changeUserName(userName, newName);
+			chatSvc.changeUserName(userName, newName);
 		}
 		
 		return "OK";
