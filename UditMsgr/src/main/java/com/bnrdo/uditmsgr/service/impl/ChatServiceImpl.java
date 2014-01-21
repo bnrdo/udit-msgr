@@ -28,7 +28,7 @@ public class ChatServiceImpl implements ChatService{
 		
 		//update the subscribers repo
 		for(User subscriber : DataStore.subscribers){
-			if(subscriber.equals(user)){
+			if(subscriber.getUserName().equals(user.getUserName())){
 				subscriber.setStatus(Status.ONLINE);
 			}
 		}
@@ -117,9 +117,10 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public boolean isUsernameExisting(String userName) {
+	public boolean isLoginValid(String userName, String ipAddress) {
 		for(User subscriber : DataStore.subscribers){
-			if(subscriber.getUserName().trim().equalsIgnoreCase(userName.trim())){
+			if(subscriber.getUserName().trim().equals(userName.trim()) && 
+					subscriber.getIpAddress().equals(ipAddress)){
 				return true;
 			}
 				
@@ -185,7 +186,7 @@ public class ChatServiceImpl implements ChatService{
 				BlockingQueue<Update> q = s.getValue();
 				
 				for(User u : DataStore.subscribers){
-					if(u.getStatus().equals(Status.ONLINE) && !u.equals(user)){
+					if(u.getStatus().equals(Status.ONLINE) && !u.getUserName().equals(user.getUserName())){
 						Update userUpdate = new UserUpdate(u);
 						
 						q.add(userUpdate);
@@ -195,5 +196,17 @@ public class ChatServiceImpl implements ChatService{
 				break;
 			}
 		}
+	}
+
+	@Override
+	public boolean isUsernameTaken(String userName) {
+		for(User subscriber : DataStore.subscribers){
+			if(subscriber.getUserName().trim().equals(userName.trim())){
+				return true;
+			}
+				
+		}
+		
+		return false;
 	}
 }

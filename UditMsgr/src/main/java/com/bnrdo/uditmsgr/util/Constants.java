@@ -8,4 +8,8 @@ public interface Constants {
 	public enum Status{
 		ONLINE, OFFLINE;
 	}
+	
+	public enum PageState{
+		INIT, VALID, INVALID;
+	}
 }

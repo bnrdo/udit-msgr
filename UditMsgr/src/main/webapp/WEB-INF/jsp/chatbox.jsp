@@ -10,7 +10,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 		<title>Messenger</title>
-		<link rel="stylesheet" type="text/css" href='<c:out value="${pageContext.request.contextPath}"/>/css/uditmsgr.css' />
+		<link rel="stylesheet" type="text/css" href='<c:out value="${pageContext.request.contextPath}"/>/css/uditmsgr.css?t=<?= time(); ?>' />
 		<script src='<c:out value="${pageContext.request.contextPath}"/>/js/jquery.min.js'></script>
 		<script type='text/javascript'>
 		
@@ -140,14 +140,14 @@
 			}
 			
 			function confirmLogout(e){
-				var choice = confirm("Close?");
+				var choice = confirm("Are you sure you want to logout?");
 				
 				if(choice === true){
 					logout(userName, 
 						function(data){
-							if(data === "OK")
+							if(data === "OK"){
 								window.location.href = "showLogoutPage.htm";
-							else{
+							}else{
 								alert("Something serious happened. Please tell Bernardo.");
 							}
 						}
@@ -301,21 +301,21 @@
 				</tr>
 				<tr>
 					<td style="padding-left:1px;">
-						<!-- <textarea id="chatDisplayMessageTextArea" class="chatTextArea" readonly></textarea> -->
+						<!-- <textarea id="chatDisplayMessageTextArea" class="chat-text-area" readonly></textarea> -->
 						<div class="messages-area">
 							<div id="chatDisplayMessageTextArea">
 							</div>
 						</div>
 					</td>
 					<td style="padding-right:1px;">
-						<!-- <textarea id="chatParticipantsListTextArea" class="chatTextArea border-none" readonly></textarea> -->
+						<!-- <textarea id="chatParticipantsListTextArea" class="chat-text-area border-none" readonly></textarea> -->
 						<div class="participants-area">
 							<div id="chatParticipantsListTextArea"></div>
 						</div>								
 					</td>
 				</tr>
 				<tr>
-					<td height="20%" width="75%" class="compose-area"><textarea id="chatSendMessageTextArea" class="chatTextArea"></textarea></td>
+					<td height="20%" width="75%" class="compose-area"><textarea id="chatSendMessageTextArea" class="chat-text-area"></textarea></td>
 					<td height="20%" width="25%" style="padding-top: 4px; padding-left: 2px;" align="center" valign="top">
 						<input type="button" id="btnSend" class="white-button" onclick="sendMessage()" value="Send"/>
 					</td>

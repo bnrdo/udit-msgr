@@ -11,7 +11,8 @@ public interface ChatService {
 	void registerUser(User user);
 	void changeUserName(String currentUserName, String newUserName);
 	void saveChatMessage(User user, Message message);
-	boolean isUsernameExisting(String userName);
+	boolean isLoginValid(String userName, String ipAddress);
+	boolean isUsernameTaken(String userName);
 	User findUserByIp(String userIp);
 	void loadOnlineSubscribersForUserView(User user);
 	List<String> getOnlineSubcribers();

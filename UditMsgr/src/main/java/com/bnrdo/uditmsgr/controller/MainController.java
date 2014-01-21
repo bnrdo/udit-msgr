@@ -6,6 +6,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,6 +20,7 @@ import com.bnrdo.uditmsgr.domain.UserUpdate;
 import com.bnrdo.uditmsgr.repo.DataStore;
 import com.bnrdo.uditmsgr.service.ChatService;
 import com.bnrdo.uditmsgr.service.UpdateService;
+import com.bnrdo.uditmsgr.util.Constants.PageState;
 import com.bnrdo.uditmsgr.util.Constants.Status;
 
 @Controller
@@ -46,6 +48,8 @@ public class MainController {
 				chatSvc.loadOnlineSubscribersForUserView(user);
 				
 				return "chatbox";
+			}else{
+				model.addAttribute("preLoginMessage", "Your IP address is already registered.");
 			}
 		}
 		
@@ -68,10 +72,6 @@ public class MainController {
 		
 		System.out.println("|------------------------------------------------ just got an update for " + userName + " : " + update);
 		
-		
-		/*nahinto ako sa, pag close using browser x then punta ulit ng site dapat parang mininimize lang, 
-		pag linogout then pag punta ulit ng chatbox login screen ulit. ung magiging icon ng user sa participants list
-		mag decide anu itsura pag naka x lang or naka log out?*/
 		ObjectMapper mapper = new ObjectMapper();
 		String response = "";
 		
@@ -109,24 +109,29 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = "/registerUser.htm", method = RequestMethod.POST)
-	protected @ResponseBody String registerUser(HttpServletRequest request, ModelMap model){
+	protected String registerUser(@ModelAttribute User user, HttpServletRequest request, ModelMap model){
 		
-		String userName = request.getParameter("userName").trim();
+		String userName = user.getUserName();
 		String ipAddress = request.getRemoteAddr();
 		
-		boolean isUsernameTaken = chatSvc.isUsernameExisting(userName);
+		user.setIpAddress(ipAddress);
+		
+		boolean isUsernameTaken = chatSvc.isUsernameTaken(userName);
+		
+		model.addAttribute("registrationForm", user);
 		
 		if(!isUsernameTaken){
-			User user = new User(userName, ipAddress);
 			chatSvc.registerUser(user);
 			chatSvc.onlineUser(user);
-			//return "redirect:/main.htm";
-			return "OK";
+			
+			model.addAttribute("pageState", PageState.VALID);
+			
+			return "register";
 		}else{
-			//model.addAttribute("isUsernameTaken", true);
-			//model.addAttribute("user", userName);
-			//return "login";
-			return "Username already exists";
+			model.addAttribute("pageState", PageState.INVALID);
+			model.addAttribute("errorMessage", "Username is already taken.");
+			
+			return "register";
 		}
 	}
 	
@@ -147,10 +152,10 @@ public class MainController {
 		String userName = request.getParameter("userName");
 		String ipAddress = request.getRemoteAddr();
 		
-		boolean isUsernamevalid = chatSvc.isUsernameExisting(userName);
+		boolean isLoginValid = chatSvc.isLoginValid(userName, ipAddress);
 		
-		if(!isUsernamevalid){
-			return "Username is not registered.";
+		if(!isLoginValid){
+			return "Invalid login.";
 		}else{
 			chatSvc.onlineUser(new User(userName, ipAddress));
 			return "OK";
@@ -162,12 +167,28 @@ public class MainController {
 		return "logout";
 	}
 	
+	@RequestMapping(value = "/showRegistrationPage.htm", method = RequestMethod.GET)
+	protected String showRegistrationPage(HttpServletRequest request, ModelMap model){
+		
+		String ipAddress = request.getRemoteAddr();
+		
+		//if there is a user already registered for this ip
+		if(chatSvc.findUserByIp(ipAddress) != null){
+			return "redirect:main.htm";
+		}
+		
+		model.addAttribute("pageState", PageState.INIT);
+		model.addAttribute("registrationForm", new User());
+		
+		return "register";
+	}
+	
 	@RequestMapping(value = "/changeName.htm", method = RequestMethod.POST)
 	protected @ResponseBody String changeName(HttpServletRequest request){
 		String userName = request.getParameter("userName");
 		String newName = request.getParameter("newName");
 		
-		if(chatSvc.isUsernameExisting(newName)){
+		if(chatSvc.isUsernameTaken(newName)){
 			return "User name already exists!";
 		}else{
 			chatSvc.changeUserName(userName, newName);

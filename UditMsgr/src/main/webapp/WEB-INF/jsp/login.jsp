@@ -98,14 +98,28 @@
 	</head>
 	<body onload="onloadHook()">
 		<!--  Register Area -->
-		<div id="registerArea">
+		<div id="login-area">
 			<table width="100%" height="100%">
 				<tr>
 					<td align="center">
-						<table>
+						<table class="gray-cute-outline">
+							<tr>
+								<td align="left" class="blue-title-14">
+									Already Registered?
+								</td>
+							</tr>
+							<tr>
+								<td align="center" class="prelogin-message">
+									<c:if test="${not empty preLoginMessage}">
+										<div>
+											<c:out value="${preLoginMessage}"/>
+										</div>
+									</c:if>
+								</td>
+							</tr>
 							<tr>
 								<td>
-									<div style="float:left;" id="display-user">
+									<div class="float-left" id="display-user">
 									<table border=0 cellSpacing=0 cellPadding=0 height="100%" width="100%">
 										<tr><td rowspan="3" valign="top"><img src='<c:out value="${pageContext.request.contextPath}"/>/images/login64.png' class='main-logo'></td></tr>
 										<tr><td class="padding-left-7" align="left"><input type="text" id="txtUserID" class='margin-left-neg-30'/></td></tr>
@@ -121,8 +135,16 @@
 							</tr>
 							<tr>
 								<td width="100%" align="right" valign="middle">
-									<input type="button" class="white-button" onclick="loginUser()" value="   Login   "/>
-									<input type="button" class="white-button" onclick="registerUser()" value="  Register "/>
+									<table width="100%">
+										<tr>
+											<td align="left" valign="bottom">
+												<span id="register-here">No? Register <a href="showRegistrationPage.htm" class="font-blue">here</a></span>
+											</td>
+											<td align="right" valign="bottom">
+												<input type="button" class="white-button" onclick="loginUser()" value="   Login   "/>			
+											</td>
+										</tr>
+									</table>
 								</td>
 							</tr>
 						</table>
