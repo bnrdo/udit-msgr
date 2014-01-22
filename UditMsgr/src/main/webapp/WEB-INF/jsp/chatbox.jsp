@@ -45,6 +45,11 @@
 				
 				$(window).bind('beforeunload', function(){
 					//note matitrigger din toh pag nag logout via confirmation
+					logout(userName, function(data){
+						if(data !== "OK"){
+							alert("Something serious happened while logging out. Please tell Bernardo.");
+						}
+					});
 				});
 				
 				fetchUpdates();	
@@ -143,15 +148,7 @@
 				var choice = confirm("Are you sure you want to logout?");
 				
 				if(choice === true){
-					logout(userName, 
-						function(data){
-							if(data === "OK"){
-								window.location.href = "showLogoutPage.htm";
-							}else{
-								alert("Something serious happened. Please tell Bernardo.");
-							}
-						}
-					);
+					window.location.href = "showLogoutPage.htm";
 				}else{
 					e.preventDefault();
 				}
@@ -159,6 +156,7 @@
 			
 			function logout(userName, successCallback){
 				$.ajax({
+					async: false,
 					cache: false,
 					type: 'POST',
 					url: 'logout.htm',
@@ -239,7 +237,7 @@
 							},
 							success : function(data){
 								if(data === "OK"){
-									logout(newName, function(data){
+									/* logout(newName, function(data){
 										if(data === "OK"){
 											alert("Name successfully changed. Please login again for the changes to take effect.");
 											window.location.href = "showLogoutPage.htm";
@@ -247,7 +245,8 @@
 										else{
 											alert("Something serious happened. Please tell Bernardo.");
 										}
-									});
+									}); */
+									window.location.href = "showLogoutPage.htm";
 								}
 								else{
 									
