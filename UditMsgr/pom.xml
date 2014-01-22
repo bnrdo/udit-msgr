@@ -116,11 +116,6 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.axis2</groupId>
-			<artifactId>axis2-jaxws-api</artifactId>
-			<version>1.4.1</version>
-		</dependency>
 	</dependencies>
 	<!-- <build>
 		<plugins>

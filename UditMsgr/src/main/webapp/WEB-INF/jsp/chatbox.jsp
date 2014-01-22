@@ -241,7 +241,6 @@
 								if(data === "OK"){
 									logout(newName, function(data){
 										if(data === "OK"){
-											if(reason === "name change")
 											alert("Name successfully changed. Please login again for the changes to take effect.");
 											window.location.href = "showLogoutPage.htm";
 										}

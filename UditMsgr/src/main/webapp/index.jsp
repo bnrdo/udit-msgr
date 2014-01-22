@@ -5,7 +5,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-		<title>UD Messenger!</title>
+		<title>Messenger!</title>
 		
 		<script type='text/javascript'>
 			var height = 430;                      
