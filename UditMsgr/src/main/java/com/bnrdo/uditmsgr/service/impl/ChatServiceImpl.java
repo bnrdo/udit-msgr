@@ -23,12 +23,13 @@ import com.bnrdo.uditmsgr.util.Constants.Status;
 public class ChatServiceImpl implements ChatService{
 
 	@Override
-	public void onlineUser(User user) {
+	public void onlineUser(String userName) {
+		User user = findUser(userName);
 		user.setStatus(Status.ONLINE);
 		
 		//update the subscribers repo
 		for(User subscriber : DataStore.subscribers){
-			if(subscriber.getUserName().equals(user.getUserName())){
+			if(subscriber.getUserName().equals(userName)){
 				subscriber.setStatus(Status.ONLINE);
 			}
 		}
@@ -47,12 +48,13 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public void offlineUser(User user) {
+	public void offlineUser(String userName) {
+		User user = findUser(userName);
 		user.setStatus(Status.OFFLINE);
 		
 		//update the subscribers repo
 		for(User subscriber : DataStore.subscribers){
-			if(subscriber.getUserName().equals(user.getUserName())){
+			if(subscriber.getUserName().equals(userName)){
 				subscriber.setStatus(Status.OFFLINE);
 			}
 		}
@@ -64,9 +66,9 @@ public class ChatServiceImpl implements ChatService{
 			
 			//if this current q owner is the user, that should add the poison pill to 
 			//his q, so that fetching of updates will stop.
-			if(qOwner.equals(user.getUserName())){
+			if(qOwner.equals(userName)){
 				q.add(new TerminateUpdate());
-				System.out.println("******************Added a Terminate Update for " + user.getUserName());
+				System.out.println("******************Added a Terminate Update for " + userName);
 			}else{
 				if(!getOfflineSubcribers().contains(qOwner)){
 					Update userUpdate = new UserUpdate(user);
@@ -117,22 +119,19 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public boolean isLoginValid(String userName, String ipAddress) {
-		for(User subscriber : DataStore.subscribers){
-			if(subscriber.getUserName().trim().equals(userName.trim()) && 
-					subscriber.getIpAddress().equals(ipAddress)){
-				return true;
-			}
-				
-		}
-		
-		return false;
-	}
-
-	@Override
 	public User findUserByIp(String userIp) {
 		for(User subscriber : DataStore.subscribers){
 			if(subscriber.getIpAddress().equals(userIp))
+				return subscriber;
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public User findUser(String userName) {
+		for(User subscriber : DataStore.subscribers){
+			if(subscriber.getUserName().equals(userName))
 				return subscriber;
 		}
 		
@@ -166,7 +165,8 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public void saveChatMessage(User user, Message message) {
+	public void saveChatMessage(String userName, Message message) {
+		User user = findUser(userName);
 		DataStore.userMessages.add(new UserMessage(user, message));
 		
 		//broadcast to subscribed user's message q
@@ -180,13 +180,13 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public void loadOnlineSubscribersForUserView(User user) {
+	public void loadOnlineSubscribersForUserView(String userName) {
 		for(Entry<String, BlockingQueue<Update>> s : DataStore._Q.entrySet()){
-			if(s.getKey().equals(user.getUserName())){
+			if(s.getKey().equals(userName)){
 				BlockingQueue<Update> q = s.getValue();
 				
 				for(User u : DataStore.subscribers){
-					if(u.getStatus().equals(Status.ONLINE) && !u.getUserName().equals(user.getUserName())){
+					if(u.getStatus().equals(Status.ONLINE) && !u.getUserName().equals(userName)){
 						Update userUpdate = new UserUpdate(u);
 						
 						q.add(userUpdate);

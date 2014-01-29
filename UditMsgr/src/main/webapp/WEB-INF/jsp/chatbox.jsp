@@ -23,16 +23,21 @@
 			var sendMessageTextA;
 			var displayMessageTextA;
 			var participantsListTextA;
+			var displayMessageContainer;
 			var userNameContainer;
 			var userName;
 			
 			var displayUserDiv;
 			var changeUserDiv;
+			
+			var msgCtr;
 		
 			function onloadHook(){
+				msgCtr = 0;
 				userName = "${user}";
 				ctxPath = '<c:out value="${pageContext.request.contextPath}"/>';
 				userNameContainer = d.getElementById("userNameContainer");
+				displayMessageContainer = d.getElementById("chatDisplayMessageContainer");
 				sendMessageTextA = d.getElementById("chatSendMessageTextArea");
 				displayMessageTextA = d.getElementById("chatDisplayMessageTextArea");
 				participantsListTextA = d.getElementById("chatParticipantsListTextArea");
@@ -44,12 +49,22 @@
 				sendMessageTextA.focus();
 				
 				$(window).bind('beforeunload', function(){
-					//note matitrigger din toh pag nag logout via confirmation
 					logout(userName, function(data){
 						if(data !== "OK"){
 							alert("Something serious happened while logging out. Please tell Bernardo.");
 						}
 					});
+				});
+				
+				$("#selectAttach").bind('change', function(){
+					/* if($("#selectAttach").val() !== ""){
+						$("#chatDisplayMessageTextArea>tbody>tr:last").after("<tr class='" + rowColorCss + "'><td>" +
+								"<table border=0 cellSpacing=0 cellPadding=0>" +
+									"<tr><td valign='top' class='user-said font-gray'>" + userNam + "&nbsp;:</td>" +
+									"<td class='message font-gray'>" + $("#fileSendFormContainer").html() + "</td></tr>" +
+								"</table>" +
+								"</td></tr>");
+					} */
 				});
 				
 				fetchUpdates();	
@@ -80,8 +95,22 @@
 						}else if(updateType === "MESSAGE_UPDATE"){
 							var userNam = resp["userMessage"]["user"]["userName"];
 							var message = resp["userMessage"]["message"]["content"];
-							displayMessageTextA.innerHTML += "<span class='user-said font-gray'>" + userNam + " : </span><span class='message font-gray'>" + message + "</span><br/>";
-							displayMessageTextA.scrollTop = 9999999;
+							var rowColorCss = 'background-gray';
+							
+							if(msgCtr % 2) rowColorCss = 'background-white';
+							
+							$("#chatDisplayMessageTextArea>tbody>tr:last")
+							.after("<tr class='" + rowColorCss + "'><td>" +
+									"<table border=0 cellSpacing=0 cellPadding=0>" +
+										"<tr><td valign='top' class='user-said font-gray'>" + userNam + "&nbsp;:</td>" +
+										"<td class='message font-gray'>" + message + "</td></tr>" +
+									"</table>" +
+									"</td></tr>");
+							
+							
+							displayMessageContainer.scrollTop = displayMessageContainer.scrollHeight;
+							
+							msgCtr++;
 						
 							fetchUpdates();
 						}else if(updateType === "TERMINATE"){
@@ -237,18 +266,9 @@
 							},
 							success : function(data){
 								if(data === "OK"){
-									/* logout(newName, function(data){
-										if(data === "OK"){
-											alert("Name successfully changed. Please login again for the changes to take effect.");
-											window.location.href = "showLogoutPage.htm";
-										}
-										else{
-											alert("Something serious happened. Please tell Bernardo.");
-										}
-									}); */
+									userName = newName;
 									window.location.href = "showLogoutPage.htm";
-								}
-								else{
+								}else{
 									
 									var txt = d.getElementById("txtEditName");
 									
@@ -261,6 +281,10 @@
 						return;
 					}
 				}
+			}
+			
+			function fileSelect(){
+				$("#selectAttach").click();
 			}
 		</script>
 	</head>
@@ -291,7 +315,7 @@
 							</div>
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/logout.png' style="margin-top:7px;" class="top-options-imgs float-right" onclick="confirmLogout()">
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/settings.png' style="margin-right: 5px; margin-top:7px;" class="top-options-imgs float-right">
-							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/attach.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right">
+							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/attach.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right" onclick="fileSelect();">
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/smiley.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right">
 							<img src='<c:out value="${pageContext.request.contextPath}"/>/images/pen.png' style="margin-right: 8px; margin-top:7px;" class="top-options-imgs float-right" onclick="editName()">
 						</div>
@@ -299,10 +323,12 @@
 				</tr>
 				<tr>
 					<td style="padding-left:1px;">
-						<!-- <textarea id="chatDisplayMessageTextArea" class="chat-text-area" readonly></textarea> -->
-						<div class="messages-area">
-							<div id="chatDisplayMessageTextArea">
-							</div>
+						<div class="messages-area" id="chatDisplayMessageContainer">
+							<table id="chatDisplayMessageTextArea" width="100%" border=0 cellSpacing=0 cellPadding=0>
+								<tbody>
+									<tr><td></td></tr>
+								</tbody>
+							</table>
 						</div>
 					</td>
 					<td style="padding-right:1px;">
@@ -313,12 +339,29 @@
 					</td>
 				</tr>
 				<tr>
-					<td height="20%" width="75%" class="compose-area"><textarea id="chatSendMessageTextArea" class="chat-text-area"></textarea></td>
+					<td height="20%" width="75%" class="compose-area"><textarea maxlength="100" id="chatSendMessageTextArea" class="chat-text-area"></textarea></td>
 					<td height="20%" width="25%" style="padding-top: 4px; padding-left: 2px;" align="center" valign="top">
 						<input type="button" id="btnSend" class="white-button" onclick="sendMessage()" value="Send"/>
 					</td>
 				</tr>
 			</table>
+			<input id="selectAttach" type="file" class="hidden" />
 		</div>
 	</body>
+	<div id="fileSendFormContainer" class="hidden">
+		<div class="file-outgoing">
+			<table width="100%">
+				<tr>
+					<td align="center" rowspan="3" width="50px"><img src='<c:out value="${pageContext.request.contextPath}"/>/images/send_file.png'></td>
+					<td align="left">You are about to upload a file</td>
+				</tr>
+				<tr>
+					<td align="left">Apujukay.docx</td>
+				</tr>
+				<tr>
+					<td align="left"><a href="#">Upload</a>&nbsp;&nbsp;<a href="#">Cancel</a></td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </html>

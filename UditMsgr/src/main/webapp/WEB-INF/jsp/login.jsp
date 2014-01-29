@@ -16,11 +16,19 @@
 		
 			var d = document;
 			var userNameTextB;
+			var loginBtn;
 			
 			function onloadHook(){
+				loginBtn = d.getElementById("btnLogin");
 				userNameTextB = d.getElementById("txtUserID");
-				userNameTextB.onkeydown = loginUserByKeyPress;
-				userNameTextB.focus();
+				
+				if("${preLoginMessage}".indexOf("already logged in") > -1){
+					loginBtn.disabled = true;
+					userNameTextB.disabled = true;
+				}else{
+					userNameTextB.onkeydown = loginUserByKeyPress;
+					userNameTextB.focus();
+				}
 			}
 			
 			function isUserNew(){
@@ -49,7 +57,7 @@
 					success : function(data){
 						if(data === "OK"){
 							alert("Successfully registered! You will now be logged in as " + newUserID);
-							window.location.href = 'main.htm';
+							window.location.href = 'showChatbox.htm';
 						}else{
 							alert(data);
 						}
@@ -58,10 +66,11 @@
 			}
 			
 			function loginUser(){
-				var userID = userNameTextB.value;
+				var userID = userNameTextB.value.trim();
 				
-				if(userID.trim() === ''){
+				if(userID === ''){
 					alert("Username should not be blank");
+					userNameTextB.focus();
 					return;
 				}
 				
@@ -74,9 +83,11 @@
 					},
 					success : function(data){
 						if(data === "OK"){
-							window.location.href = 'main.htm';
+							window.location.href = 'showChatbox.htm';
 						}else{
 							alert(data);
+							userNameTextB.focus();
+							userNameTextB.select();
 						}
 					}
 				});
@@ -141,7 +152,7 @@
 												<span id="register-here">No? Register <a href="showRegistrationPage.htm" class="font-blue">here</a></span>
 											</td>
 											<td align="right" valign="bottom">
-												<input type="button" class="white-button" onclick="loginUser()" value="   Login   "/>			
+												<input id="btnLogin" type="button" class="white-button" onclick="loginUser()" value="   Login   "/>			
 											</td>
 										</tr>
 									</table>
@@ -150,6 +161,11 @@
 						</table>
 					</td>
 				</tr>
+				<!-- <tr>
+					<td>
+						
+					</td>
+				</tr> -->
 			</table>
 		</div>
 	</body>

@@ -13,6 +13,6 @@
 		<link rel="stylesheet" type="text/css" href='<c:out value="${pageContext.request.contextPath}"/>/css/uditmsgr.css?t=<?= time(); ?>' />
 	</head>
 	<body>
-		You have logged out of UD chatbox!
+		You have logged out of chatbox!
 	</body>
 </html>

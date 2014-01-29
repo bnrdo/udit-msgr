@@ -6,15 +6,15 @@ import com.bnrdo.uditmsgr.domain.Message;
 import com.bnrdo.uditmsgr.domain.User;
 
 public interface ChatService {
-	void onlineUser(User user);
-	void offlineUser(User user);
+	void onlineUser(String userName);
+	void offlineUser(String userName);
 	void registerUser(User user);
 	void changeUserName(String currentUserName, String newUserName);
-	void saveChatMessage(User user, Message message);
-	boolean isLoginValid(String userName, String ipAddress);
+	void saveChatMessage(String userName, Message message);
 	boolean isUsernameTaken(String userName);
 	User findUserByIp(String userIp);
-	void loadOnlineSubscribersForUserView(User user);
+	User findUser(String userName);
+	void loadOnlineSubscribersForUserView(String userName);
 	List<String> getOnlineSubcribers();
 	List<String> getOfflineSubcribers();
 }

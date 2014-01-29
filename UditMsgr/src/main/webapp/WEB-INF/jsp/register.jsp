@@ -103,11 +103,11 @@
 				
 				alert("User successfully registered. You will be logged in automatically.");
 				
-				window.location.href = "main.htm";
+				window.location.href = "showChatbox.htm";
 			}
 			
 			function doInvalidState(){
-				
+				alert("${errorMessage}");
 			}
 			
 			function doInitState(){
@@ -160,7 +160,7 @@
 								<table width="100%">
 									<tr>
 										<td align="right" valign="bottom"><input type="button" class="white-button" onclick="registerUser()" value="  Register "/></td>
-										<td align="right" valign="bottom" width="15%"><input type="button" class="white-button" onclick="window.location.href = 'main.htm';" value="  Back "/></td>
+										<td align="right" valign="bottom" width="15%"><input type="button" class="white-button" onclick="window.location.href = 'showChatbox.htm';" value="  Back "/></td>
 									</tr>
 								</table>
 							</td>

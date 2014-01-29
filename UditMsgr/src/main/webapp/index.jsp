@@ -14,7 +14,7 @@
 			var left = 20;                         
 			
 			if(document.location.search == '')  {
-				newwin=window.open("main.htm", name, "fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no,width=" + width + ",height=" + height + ",left=" + left + ",top=" + top);
+				newwin=window.open("showLoginPage.htm", name, "fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no,width=" + width + ",height=" + height + ",left=" + left + ",top=" + top);
 				this.focus();
 				self.opener = this;
 				self.close();
